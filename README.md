@@ -2,7 +2,7 @@
 
 A recruiting preview for the third Community.Markets launch, focused on Manteca, Lathrop, Ripon, Salida and Escalon. The visual direction follows the Hey108 and HeyLaguna family while giving Highway 99 its own route identity.
 
-The site is static HTML and CSS. Open `index.html` directly or serve the directory with `python3 -m http.server 8000`. There is no build or account backend. The `/join/` page embeds a Hey99-specific Tally application; responses stay in the same Tally workspace as the sibling markets. Reward details point to the shared [earnings page](https://community.markets/economics/).
+The site is static HTML and CSS. Open `index.html` directly or serve the directory with `python3 -m http.server 8000`. There is no build or account backend. The `/join/` page embeds a Hey99-specific Tally application; responses stay in the same Tally workspace as the sibling markets. The `/market/` page is a Hey99 marketplace preview without invented sellers or offers. Reward details point to the shared [earnings page](https://community.markets/economics/).
 
 ## GitHub Pages
 
