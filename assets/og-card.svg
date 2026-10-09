@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<rect width="1200" height="630" fill="#321579"/>
+<g opacity=".12" fill="#fff"><circle cx="62" cy="66" r="3"/><circle cx="182" cy="66" r="3"/><circle cx="302" cy="66" r="3"/><circle cx="422" cy="66" r="3"/><circle cx="542" cy="66" r="3"/><circle cx="662" cy="66" r="3"/><circle cx="782" cy="66" r="3"/><circle cx="902" cy="66" r="3"/><circle cx="1022" cy="66" r="3"/><circle cx="1142" cy="66" r="3"/></g>
+<rect x="55" y="50" width="285" height="48" rx="24" fill="#c8f338"/><text x="80" y="82" fill="#1f0c51" font-family="Arial,sans-serif" font-weight="900" font-size="22" letter-spacing="2">MARKET 03 · COMING NEXT</text>
+<text x="52" y="235" fill="#fff" font-family="Arial,sans-serif" font-weight="900" font-size="104">BUILD WHAT’S NEXT</text>
+<text x="52" y="343" fill="#c8f338" font-family="Arial,sans-serif" font-weight="900" font-size="104">ALONG THE 99.</text>
+<text x="58" y="415" fill="#fff" font-family="Arial,sans-serif" font-size="28">Manteca · Lathrop · Ripon · Salida · Escalon</text>
+<path d="M925 65h210v62l-18 22v265c0 67-79 114-87 117-8-3-87-50-87-117V149l-18-22z" fill="#c8f338" stroke="#1f0c51" stroke-width="14"/>
+<text x="1030" y="144" fill="#1f0c51" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="900">CALIFORNIA</text><path d="M948 157h165" stroke="#1f0c51" stroke-width="8"/><text x="1030" y="364" fill="#1f0c51" text-anchor="middle" font-family="Arial,sans-serif" font-size="200" font-weight="900">99</text>
+<rect x="0" y="550" width="1200" height="80" fill="#1f0c51"/><path d="M20 589h120m65 0h120m65 0h120m65 0h120m65 0h120m65 0h120m65 0h120" stroke="#c8f338" stroke-width="7" stroke-linecap="round"/>
+</svg>
