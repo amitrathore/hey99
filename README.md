@@ -6,7 +6,7 @@ The site is static HTML and CSS. Open `index.html` directly or serve the directo
 
 ## GitHub Pages
 
-In **Settings → Pages**, choose **Deploy from a branch**, `main`, and `/ (root)`. Both pages use relative internal and asset paths for the project URL `https://amitrathore.github.io/hey99/`. Their canonical and social image URLs also point there; update those if a custom domain replaces it.
+In **Settings → Pages**, choose **Deploy from a branch**, `main`, and `/ (root)`. The custom domain is `https://hey99.online/`. The root `CNAME` file and Cloudflare DNS point this branch-published site to GitHub Pages. All pages use relative internal and asset paths, and canonical and social image URLs use the custom domain.
 
 ## Launch status
 
