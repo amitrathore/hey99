@@ -52,13 +52,10 @@
 
 (def game-spec
   {:name "Hey99"
-   :description (str "The coseller network for the Highway 99 local economy: "
-                     "discover local offers, buy from local people, and earn when "
-                     "your recommendation helps make a sale.")
+   :description "A local economy built by the people and businesses of the Highway 99 community."
 
    ;; The-js's full protocol set, verbatim. `attention` carries campaigns and
-   ;; local content; `withdrawal` because a coseller network that cannot pay
-   ;; anyone out is a half-protocol.
+   ;; local content. Financial commands remain disabled during the preview.
    :protocols ["attention" "market" "coseller" "withdrawal" "introspection" "avatar"]
 
    ;; Residents join as audience and may opt into Coselling under the same

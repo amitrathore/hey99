@@ -44,7 +44,7 @@ fly status --app hey99
 
 GitHub Actions verifies the GM and browser flows before deploying. It builds the container on the GitHub runner so its app-restricted token does not need access to an organization-wide remote builder. Its `FLY_API_TOKEN` repository secret should be restricted to this app. Secrets are excluded from Git and the Docker build context.
 
-The custom domain is `hey99.online`. Switch its DNS from GitHub Pages only after verifying the Fly deployment and certificates. To roll back a release, deploy the previous verified commit; MoM retains the game's state independently of the container.
+The custom domain is `hey99.online`; its A/AAAA records point directly to Fly, and `www` redirects to the apex while preserving paths and referral parameters. Cloudflare supplies DNS only. Universal SSL is disabled to avoid conflicting ACME challenges; Fly owns the active certificates and renewal records. GitHub Pages is retired. To roll back a release, deploy the previous verified commit; MoM retains the game's state independently of the container.
 
 ## Editorial workflow
 

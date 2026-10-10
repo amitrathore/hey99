@@ -40,7 +40,7 @@
 (deftest preview-boundary-and-webhook-authentication
   (doseq [event ["market/accept-offer" "coseller/settle-order" "withdrawal/request" "market/record-payment"]]
     (is (= "commerce-not-active" (get-in (h/dispatch {:event/type event}) [:error :code]))))
-  (doseq [event ["coseller/register" "coseller/record-touch" "coseller/claim-visitor"]]
+  (doseq [event ["coseller/register" "coseller/record-touch" "coseller/claim-visitor" "market/register-category" "market/register-hashtag"]]
     (is (not (h/commerce-blocked? event))))
   (with-redefs [cfg/resolve-mom-api-token (constantly nil)]
     (is (= 401 (:status (h/app {:request-method :post :uri "/v1/gm/handle" :headers {} :body {:event/type "gm/query-state"}}))))))

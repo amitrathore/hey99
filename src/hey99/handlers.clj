@@ -120,7 +120,7 @@
 ;;
 ;; Every protocol Hey99 could dispatch. Only names in the spec's :protocols end
 ;; up in merged-manifest, so this may be wider than the spec — never narrower.
-;; market and coseller are registered WHOLE: Hey99 settles real sales.
+;; Register the shared protocols, with the preview commerce boundary below.
 
 (def protocol-registry
   {"attention"     attention/manifest
@@ -140,7 +140,7 @@
 
 ;; --- Dispatcher ---
 
-(def preview-allowed #{"coseller/register" "coseller/record-touch" "coseller/claim-visitor"})
+(def preview-allowed #{"coseller/register" "coseller/record-touch" "coseller/claim-visitor" "market/register-category" "market/register-hashtag"})
 (defn commerce-blocked? [event]
   (let [k (keyword (str event)) p (some-> k namespace keyword)
         op (get-in merged-manifest [p (keyword (name k))])]
