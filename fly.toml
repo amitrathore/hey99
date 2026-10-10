@@ -1,0 +1,33 @@
+app = "hey99"
+primary_region = "sjc"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  MOM_URL = "https://mom.intergraph.ai"
+  GAME_NAME = "hey99"
+  PLAYER_GROUP_ID = "gm-hey99"
+  GM_PORT = "8888"
+  GM_URL = "https://hey99.fly.dev"
+  APP_BASE_URL = "https://hey99.online"
+  AUTH_BASE_URL = "https://auth.intergraph.ai"
+
+[http_service]
+  internal_port = 8888
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  interval = "15s"
+  timeout = "5s"
+  grace_period = "90s"
+  method = "GET"
+  path = "/ready"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory = "1gb"

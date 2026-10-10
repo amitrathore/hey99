@@ -1,0 +1,9 @@
+.env*
+!.env.example
+target/
+.lein-*
+node_modules/
+test-results/
+playwright-report/
+.DS_Store
+resources/ui/
