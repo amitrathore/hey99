@@ -8,6 +8,7 @@
                  [ai.intergraph/game-master "0.1.19-SNAPSHOT"]
                  [clj-http "3.12.3"]
                  [cheshire "5.11.0"]
+                 [org.jsoup/jsoup "1.18.3"]
                  [compojure "1.7.0"]
                  [ring/ring-json "0.5.1"]
                  [ring/ring-defaults "0.3.4"]

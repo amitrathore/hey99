@@ -378,6 +378,15 @@
                                            vec)}}
             {:status 503 :body {:error {:message "The studio is temporarily unavailable. Your drafts remain saved."}}})))))
 
+(defn studio-preview-response [request]
+  (let [{:keys [seat response]} (gm-identity/require-selected-seat request (identity-opts))]
+    (or response
+        (if (some (seat-roles seat) ["strategist" "creator" "contributor"])
+          {:status 200 :headers {"Cache-Control" "no-store"}
+           :body {:html (str (ui/featured-image (:body request) "story-featured" false)
+                            (ui/article-body (:body request)))}}
+          {:status 403 :body {:error {:message "Writer or editor access is required."}}}))))
+
 (defn player-token-response [request]
   (let [{:keys [context seat response]} (gm-identity/require-selected-seat request (identity-opts))
         roles (seat-roles seat)
@@ -484,6 +493,7 @@
           {:status 502 :body {:error {:code "state-unavailable"}}}))))
 
   (GET "/api/studio" [:as request] (studio-response request))
+  (POST "/api/studio/preview" [:as request] (studio-preview-response request))
   (POST "/api/player-token" [:as request] (player-token-response request))
   (POST "/events" [:as request] (event-response request))
 

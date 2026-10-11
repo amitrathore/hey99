@@ -119,3 +119,40 @@ test('seat token disappears when it expires',async({page})=>{
  await expect(page.getByLabel('Seat token')).toBeVisible();
  await expect(page.getByLabel('Seat token')).toHaveCount(0,{timeout:5000});
 });
+
+test('writer previews and submits a featured image and formatted story',async({page})=>{
+ const flow=await mock(page,{...user,selectedSeat:{playerName:'neighbor',playerRoles:['contributor']}});
+ let preview;
+ await page.route('**/api/studio/preview',r=>{preview=r.request().postDataJSON();return r.fulfill({json:{html:'<h2>A community story</h2><figure><img src="/assets/editorial/finding-home-ripon-v1.webp" alt="Ripon" loading="lazy"><figcaption>Neighbors together.</figcaption></figure>'}})});
+ await page.setViewportSize({width:320,height:900});await page.goto('/studio/');
+ await page.getByLabel('Featured image URL').fill('/assets/featured/why-start-hey99-v1.jpg');
+ await page.getByLabel('Featured image description').fill('Neighbors and shops.');
+ await page.getByLabel('Story format').selectOption('html');
+ await page.locator('.draft-form textarea[name=body]').fill('<h2>A community story</h2><p>Our place.</p>');
+ await page.getByRole('button',{name:'Preview story'}).click();
+ await expect(page.locator('.story-preview figcaption')).toHaveText('Neighbors together.');
+ expect(preview.metadata.body_format).toBe('html');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+ await page.getByRole('button',{name:'Submit for review'}).click();
+ await expect.poll(()=>flow.events.length).toBe(1);
+ expect(flow.events[0]['event/data'].content.featured_image).toBe('/assets/featured/why-start-hey99-v1.jpg');
+ expect(flow.events[0]['event/data'].content.metadata.featured_image_alt).toBe('Neighbors and shops.');
+});
+
+
+test('illustrated story images fit mobile screens and load with sharing metadata',async({page})=>{
+ await mock(page);
+ for(const width of [320,375,1440]){
+  await page.setViewportSize({width,height:900});await page.goto('/stories/illustrated-community/');
+  const images=page.locator('.article-body img');await expect(images).toHaveCount(5);
+  for(const image of await images.all()){
+   await image.scrollIntoViewIfNeeded();
+   await expect.poll(()=>image.evaluate(i=>i.complete&&i.naturalWidth>0)).toBe(true);
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+ }
+ await expect(page.locator('.story-featured')).toHaveAttribute('loading','eager');
+ await expect(page.locator('.article-body figure img').first()).toHaveAttribute('loading','lazy');
+ await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/featured/why-start-hey99-v1.jpg');
+ await page.setViewportSize({width:375,height:900});await page.screenshot({path:'/private/tmp/hey99-illustrated-mobile.png',fullPage:true});
+});

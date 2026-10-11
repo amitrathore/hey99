@@ -104,3 +104,37 @@
     (is (= "your-local-connections" (:slug published)))
     (is (= "maya" (:author published)))
     (is (= "guest" (:byline-kind published)))))
+
+(deftest illustrated-stories-render-safe-html-and-specific-share-images
+  (let [p {:title "Our neighborhood" :summary "Together." :featured_image "/assets/featured/movement.jpg"
+           :metadata {:body_format "html" :featured_image_alt "Neighbors & local shops"}
+           :body "<h2>Welcome</h2><p>A <strong>local</strong> story.</p><figure><img src='/assets/editorial/community.webp' alt='Our community' onerror='alert(1)'><figcaption>Rooted here.</figcaption></figure><script>alert(1)</script><iframe src='https://bad.test'></iframe><a href='javascript:alert(1)'>Bad</a><img src='//bad.test/x'><img src='data:image/png;base64,abc'>"}
+        rendered (:body (ui/story-page (assoc article :payload p)))
+        safe (ui/article-body p)]
+    (is (str/includes? rendered "https://hey99.online/assets/featured/movement.jpg"))
+    (is (str/includes? rendered "Neighbors &amp; local shops"))
+    (is (str/includes? rendered "fetchpriority=\"high\""))
+    (is (str/includes? safe "<h2>Welcome</h2>"))
+    (is (re-find #"<figcaption>\s*Rooted here\.\s*</figcaption>" safe))
+    (is (str/includes? safe "loading=\"lazy\""))
+    (doseq [bad ["onerror" "<script" "<iframe" "javascript:" "//bad.test" "data:image"]]
+      (is (not (str/includes? safe bad)) bad))
+    (is (str/includes? (ui/story-card (assoc article :payload p)) "story-thumb"))))
+
+(deftest image-url-validation
+  (doseq [url ["/assets/image.webp" "https://hey99.online/assets/image.jpg"]]
+    (is (= url (ui/safe-image-url url))))
+  (doseq [url ["//evil.test/x" "http://evil.test/x" "javascript:alert(1)" "data:image/png,x" "/\\evil.test/x" "/a b" "https://user:secret@evil.test/x"]]
+    (is (nil? (ui/safe-image-url url)) url)))
+
+(deftest studio-preview-is-private-and-uses-the-public-renderer
+  (with-redefs [identity/require-selected-seat (constantly {:response {:status 401 :body {:error "Sign in"}}})]
+    (is (= 401 (:status (h/studio-preview-response {})))))
+  (with-redefs [identity/require-selected-seat (constantly {:seat {:player-roles ["audience"]}})]
+    (is (= 403 (:status (h/studio-preview-response {})))))
+  (with-redefs [identity/require-selected-seat (constantly {:seat {:player-roles ["creator"]}})]
+    (let [payload {:body "<h2>Hi</h2><script>evil()</script>" :metadata {:body_format "html"}}
+          response (h/studio-preview-response {:body payload})]
+      (is (= 200 (:status response)))
+      (is (= "no-store" (get-in response [:headers "Cache-Control"])))
+      (is (= (ui/article-body payload) (get-in response [:body :html]))))))
