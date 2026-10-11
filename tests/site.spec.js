@@ -156,3 +156,20 @@ test('illustrated story images fit mobile screens and load with sharing metadata
  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/featured/why-start-hey99-v1.jpg');
  await page.setViewportSize({width:375,height:900});await page.screenshot({path:testInfo.outputPath('illustrated-mobile.png'),fullPage:true});
 });
+
+test('founder page is linked from every footer and fits mobile screens',async({page})=>{
+ await mock(page);
+ for(const path of ['/','/join/','/market/','/economics/','/stories/','/account/','/studio/']){
+  await page.goto(path);await expect(page.locator('footer a[href="/about/"]')).toHaveCount(1);
+ }
+ for(const width of [320,375,1440]){
+  await page.setViewportSize({width,height:900});await page.goto('/about/');
+  await expect(page.locator('h1')).toHaveText('Hi, I’m Amit.');
+  await expect(page.getByText('everyday people like us',{exact:false})).toBeVisible();
+  const portrait=page.locator('.founder-portrait img');await expect.poll(()=>portrait.evaluate(i=>i.complete&&i.naturalWidth>0)).toBe(true);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+ }
+ await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hey99.online/about/');
+ await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/Meet Amit Rathore/);
+ await page.goto('/about');await expect(page).toHaveURL(/\/about\/$/);
+});

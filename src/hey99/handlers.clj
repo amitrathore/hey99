@@ -537,11 +537,12 @@
       (ui/stories-page (get-in state [:attention :feed]))
       (ui/unavailable)))
   (GET "/stories/:slug/" [slug :as request] (story-response request slug))
+  (GET "/about/" [] (ui/about-page))
   (GET "/privacy/" [] (ui/privacy-page))
   (GET "/terms/" [] (ui/terms-page))
   (GET "*" [:as request]
     (let [path (:uri request)]
-      (if (contains? #{"/join" "/market" "/economics" "/account" "/share" "/studio" "/stories" "/privacy" "/terms"} path)
+      (if (contains? #{"/join" "/market" "/economics" "/account" "/share" "/studio" "/stories" "/privacy" "/terms" "/about"} path)
         {:status 308 :headers {"Location" (str path "/" (when-let [q (:query-string request)] (str "?" q)))}}
         (ui/not-found)))))
 
