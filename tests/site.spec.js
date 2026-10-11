@@ -65,9 +65,13 @@ test('invited writer can generate and copy a one-hour seat token',async({page})=
  await page.addInitScript(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:async v=>window.copied=v}})});
  await page.setViewportSize({width:320,height:900});
  await page.goto('/studio/');
- await expect(page.getByRole('heading',{name:'Connect your AI'})).toBeVisible();
+ await expect(page.locator('.connect-ai > summary')).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+ expect(await page.locator('.studio-tasks').evaluate((tasks)=>tasks.compareDocumentPosition(document.querySelector('.connect-ai')) & Node.DOCUMENT_POSITION_FOLLOWING)).toBeTruthy();
+ await expect(page.getByRole('button',{name:'Generate seat token'})).toBeHidden();
+ await page.locator('.connect-ai > summary').click();
  await page.getByRole('button',{name:'Generate seat token'}).click();
+ await expect(page.locator('.connect-ai')).toHaveAttribute('open','');
  await expect(page.getByLabel('Seat token')).toHaveAttribute('type','password');
  await page.getByRole('button',{name:'Reveal token'}).click();
  await expect(page.getByLabel('Seat token')).toHaveValue('test-seat-token');
@@ -91,24 +95,26 @@ test('multi-seat account selects an invited seat before generating a token',asyn
  await page.goto('/studio/');
  await expect(page.getByText('Choose the Hey99 handle you are acting as.')).toBeVisible();
  await page.getByLabel('Acting as').selectOption('writer');
- await expect(page.getByRole('heading',{name:'Connect your AI'})).toBeVisible();
+ await expect(page.locator('.connect-ai > summary')).toBeVisible();
+ await page.locator('.connect-ai > summary').click();
  await page.getByRole('button',{name:'Generate seat token'}).click();
  expect(tokenSeat).toBe('writer');
  await page.getByLabel('Acting as').selectOption('reader');
- await expect(page.getByRole('heading',{name:'Connect your AI'})).toHaveCount(0);
+ await expect(page.locator('.connect-ai')).toHaveCount(0);
  await expect(page.getByLabel('Seat token')).toHaveCount(0);
 });
 
 test('audience seat does not see AI connection controls',async({page})=>{
  await mock(page,user);
  await page.goto('/studio/');
- await expect(page.getByRole('heading',{name:'Connect your AI'})).toHaveCount(0);
+ await expect(page.locator('.connect-ai')).toHaveCount(0);
 });
 
 test('seat token disappears when it expires',async({page})=>{
  await mock(page,{...user,selectedSeat:{playerName:'neighbor',playerRoles:['contributor']}});
  await page.route('**/api/player-token',r=>r.fulfill({json:{token:'short-lived-token','expires-at':Date.now()+1000,'expires-in':1}}));
  await page.goto('/studio/');
+ await page.locator('.connect-ai > summary').click();
  await page.getByRole('button',{name:'Generate seat token'}).click();
  await expect(page.getByLabel('Seat token')).toBeVisible();
  await expect(page.getByLabel('Seat token')).toHaveCount(0,{timeout:5000});
