@@ -19,3 +19,16 @@ Listing thumbnail: /assets/featured/why-start-hey99-thumb-v1.webp (600 × 400).
 Body illustrations: /assets/editorial/*-v1.webp (1000 × 667).
 
 Attention payload uses featured_image and metadata.featured_image_alt / featured_image_thumbnail. Formatted stories explicitly set metadata.body_format to html. Body images are figure/img/figcaption HTML with alt text and dimensions; the website sanitizes markup and loads inline images lazily. Existing plain text stories remain plain text.
+
+## Revised body illustrations (v2)
+
+Generated with the built-in imagegen tool on October 10, 2026. The original cover remains the sole image showing the Historic Ripon arch. All four body images explicitly exclude arches, gateways, Highway 99 shields and recurring town panoramas. Original v1 files are retained for older references.
+
+Shared prompt direction: 3:2 editorial artwork, textured gouache and screenprint, cream paper, warm terracotta, leafy green, blossom pink accents, golden light, expressive simplified forms; clearly non-photorealistic. Tiny discreet lowercase #hey99 signature at lower right.
+
+- finding-home-ripon-v2.webp: spacious river landscape inspired by the Stanislaus River at Mavis Stouffer Park, reflected willows, leafy riverside path, small groups of neighbors exchanging greetings, flat Central Valley terrain.
+- market-together-v2.webp: closer downtown merchant and maker scene inspired by Manteca’s Yosemite and Main streets, low brick storefronts and original abstract community mural, produce and handmade ceramics.
+- influence-travels-v2.webp: intimate home kitchen table, older woman sharing a recipe on her phone, food and a recipe card; surrounding vignettes of a reader and a couple planning a journey, connected with soft conversational shapes.
+- movement-taking-root-v2.webp: broad park picnic inspired by Manteca’s Library Park, off-center white gazebo, mature shade trees, open lawn, varied groups sharing food, music and conversation.
+
+Each production image is 1000 × 667 WebP and less than 180 KB. These remain artistic interpretations rather than documentary views.
