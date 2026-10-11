@@ -140,7 +140,7 @@ test('writer previews and submits a featured image and formatted story',async({p
 });
 
 
-test('illustrated story images fit mobile screens and load with sharing metadata',async({page})=>{
+test('illustrated story images fit mobile screens and load with sharing metadata',async({page},testInfo)=>{
  await mock(page);
  for(const width of [320,375,1440]){
   await page.setViewportSize({width,height:900});await page.goto('/stories/illustrated-community/');
@@ -154,5 +154,5 @@ test('illustrated story images fit mobile screens and load with sharing metadata
  await expect(page.locator('.story-featured')).toHaveAttribute('loading','eager');
  await expect(page.locator('.article-body figure img').first()).toHaveAttribute('loading','lazy');
  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/featured/why-start-hey99-v1.jpg');
- await page.setViewportSize({width:375,height:900});await page.screenshot({path:'/private/tmp/hey99-illustrated-mobile.png',fullPage:true});
+ await page.setViewportSize({width:375,height:900});await page.screenshot({path:testInfo.outputPath('illustrated-mobile.png'),fullPage:true});
 });
