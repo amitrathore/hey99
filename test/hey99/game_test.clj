@@ -55,6 +55,44 @@
                 h/effective-state (constantly {:attention {:tasks {"one" {:id "one" :assignee "maya"} "two" {:id "two" :assignee "other"}}}})]
     (is (= ["one"] (map :id (get-in (h/studio-response {}) [:body :tasks]))))))
 
+(deftest player-token-requires-an-invited-selected-seat
+  (with-redefs [identity/require-selected-seat (constantly {:response {:status 401 :body {:error "Authorization required"}}})]
+    (is (= 401 (:status (h/player-token-response {})))))
+  (with-redefs [identity/require-selected-seat (constantly {:response {:status 400 :body {:error "Seat required"}}})]
+    (is (= 400 (:status (h/player-token-response {})))))
+  (with-redefs [identity/require-selected-seat (constantly {:context {:game-name "hey99"} :seat {:player-name "reader" :player-roles ["audience"]}})]
+    (let [resp (h/player-token-response {})]
+      (is (= 403 (:status resp)))
+      (is (= "no-store" (get-in resp [:headers "Cache-Control"]))))))
+
+(deftest player-token-forwards-only-the-selected-user-seat
+  (let [request {:headers {"authorization" "Bearer user-token" "x-selected-seat" "writer"}}
+        exchange (atom nil)]
+    (with-redefs [identity/require-selected-seat (constantly {:context {:game-name "hey99"} :seat {:player-name "writer" :player-roles ["contributor"]}})
+                  clj-http.client/post (fn [url opts] (reset! exchange [url opts]) {:status 200 :body {:token "seat-token" :expires-in 3600}})]
+      (let [resp (h/player-token-response request)]
+        (is (= 200 (:status resp)))
+        (is (= "seat-token" (get-in resp [:body :token])))
+        (is (= "no-store" (get-in resp [:headers "Cache-Control"])))
+        (is (str/ends-with? (first @exchange) "/auth/player-token"))
+        (is (= "Bearer user-token" (get-in @exchange [1 :headers "Authorization"])))
+        (is (= {:game-name "hey99" :caller-player-name "writer"}
+               (cheshire.core/parse-string (get-in @exchange [1 :body]) true)))))))
+
+(deftest player-token-route-and-upstream-failures
+  (with-redefs [identity/require-selected-seat (constantly {:response {:status 401 :body {:error "Authorization required"}}})]
+    (let [resp (h/app {:request-method :post :uri "/api/player-token" :headers {}})]
+      (is (= 401 (:status resp)))
+      (is (= "no-store" (get-in resp [:headers "Cache-Control"])))))
+  (with-redefs [identity/require-selected-seat (constantly {:context {:game-name "hey99"} :seat {:player-name "writer" :player-roles ["creator"]}})
+                clj-http.client/post (fn [_ _] {:status 503 :body {:error "MoM unavailable"}})]
+    (is (= 503 (:status (h/player-token-response {})))))
+  (with-redefs [identity/require-selected-seat (constantly {:context {:game-name "hey99"} :seat {:player-name "writer" :player-roles ["strategist"]}})
+                clj-http.client/post (fn [_ _] (throw (Exception. "network error")))]
+    (let [resp (h/player-token-response {})]
+      (is (= 502 (:status resp)))
+      (is (= "no-store" (get-in resp [:headers "Cache-Control"]))))))
+
 (deftest attention-review-produces-addressed-credited-story
   (let [start (attention/handle-start-piece {:event/data {:player-name "maya" :roles ["contributor"] :spec {:title "Your local connections"}} :game-state {}})
         id (get-in start [:data :task-id])

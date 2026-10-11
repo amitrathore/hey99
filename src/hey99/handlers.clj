@@ -378,6 +378,30 @@
                                            vec)}}
             {:status 503 :body {:error {:message "The studio is temporarily unavailable. Your drafts remain saved."}}})))))
 
+(defn player-token-response [request]
+  (let [{:keys [context seat response]} (gm-identity/require-selected-seat request (identity-opts))
+        roles (seat-roles seat)
+        result (or response
+                   (if-not (some roles ["strategist" "creator" "contributor"])
+                     {:status 403 :body {:error {:code "studio-role-required"
+                                                 :message "Connect your AI is available to invited writers and editors."}}}
+                     (try
+                       (let [upstream (http/post (str (gm-identity/mom-url nil) "/auth/player-token")
+                                                 (gm-identity/request-user-auth
+                                                   request
+                                                   {:content-type :json
+                                                    :body (json/generate-string
+                                                            {:game-name (:game-name context)
+                                                             :caller-player-name (:player-name seat)})
+                                                    :as :json
+                                                    :throw-exceptions false}))]
+                         {:status (:status upstream) :body (:body upstream)})
+                       (catch Exception e
+                         (log! "ERROR" "Seat token exchange failed" {:error (.getMessage e)})
+                         {:status 502 :body {:error {:code "token-service-unavailable"
+                                                     :message "Could not connect to MoM. Try again shortly."}}}))))]
+    (update result :headers (fnil assoc {}) "Cache-Control" "no-store")))
+
 (defn story-response [request slug]
   (if-let [state (effective-state request (current-game-name))]
     (if-let [item (some #(when (= slug (:slug %)) %) (get-in state [:attention :feed]))]
@@ -460,6 +484,7 @@
           {:status 502 :body {:error {:code "state-unavailable"}}}))))
 
   (GET "/api/studio" [:as request] (studio-response request))
+  (POST "/api/player-token" [:as request] (player-token-response request))
   (POST "/events" [:as request] (event-response request))
 
   (POST "/v1/gm/handle" [:as request]

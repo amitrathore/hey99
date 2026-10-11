@@ -9,7 +9,7 @@ The original homepage, marketplace preview, economics explanation and Tally appl
 - `/account/`: sign in through Intergraph, choose a handle and manage participation.
 - `/share/`: activate coseller participation and obtain personal links. Referral visits are recorded anonymously and claimed after sign-in.
 - `/stories/`: published Attention Protocol articles, with individual server-rendered titles, descriptions, canonical URLs and author credit.
-- `/studio/`: invited writers create and submit stories; strategists assign briefs, return feedback and approve publication. A writer sees only their assigned drafts; editors see the review queue.
+- `/studio/`: invited writers create and submit stories; strategists assign briefs, return feedback and approve publication. A writer sees only their assigned drafts; editors see the review queue. Invited players can generate a one-hour MoM MCP seat token from “Connect your AI”; accounts with multiple seats choose a handle first.
 - `/economics/`: the intended reward model, explained without leaving Hey99.
 
 **Preview:** no active offers, checkout, payments, settlements or withdrawals. Those commands are rejected by the GM. Tracking and published stories do not create preview earnings. Accounts cannot self-claim editorial roles.

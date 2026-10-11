@@ -4,6 +4,7 @@ async function mock(page, session={authenticated:false}) {
  let current=structuredClone(session), referral=null, events=[];
  await page.route('**/auth.json',r=>r.fulfill({json:{auth_base_url:'https://auth.intergraph.ai'}}));
  await page.route('**/session',r=>r.fulfill({json:current}));
+ await page.route('**/seats',r=>r.fulfill({json:{seats:current.selectedSeat?[current.selectedSeat]:[]}}));
  await page.route('**/coseller/claim-visitor',r=>r.fulfill({json:{ok:true}}));
  await page.route('**/join/claim',r=>{const data=r.request().postDataJSON();current={authenticated:true,selectedSeat:{playerName:data['player-name'],playerRoles:['audience']}};return r.fulfill({json:{success:true}})});
  await page.route('**/api/coseller/activate',r=>{current.selectedSeat.playerRoles.push('coseller');referral='neighbor-token';return r.fulfill({json:{status:'active','ref-token':referral}})});
@@ -56,4 +57,59 @@ test('writer submits a story; audience does not see editorial controls',async({p
  expect(flow.events[0]['event/type']).toBe('attention/submit-draft');
  expect(flow.events[0]['event/data'].content.body).toBe('My useful local story.');
  await expect(page.getByRole('button',{name:'Approve and publish'})).toHaveCount(0);
+});
+
+test('invited writer can generate and copy a one-hour seat token',async({page})=>{
+ await mock(page,{...user,selectedSeat:{playerName:'neighbor',playerRoles:['contributor']}});
+ await page.route('**/api/player-token',r=>r.fulfill({json:{token:'test-seat-token','expires-at':Date.now()+3600000,'expires-in':3600}}));
+ await page.addInitScript(()=>{Object.defineProperty(navigator,'clipboard',{value:{writeText:async v=>window.copied=v}})});
+ await page.setViewportSize({width:320,height:900});
+ await page.goto('/studio/');
+ await expect(page.getByRole('heading',{name:'Connect your AI'})).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
+ await page.getByRole('button',{name:'Generate seat token'}).click();
+ await expect(page.getByLabel('Seat token')).toHaveAttribute('type','password');
+ await page.getByRole('button',{name:'Reveal token'}).click();
+ await expect(page.getByLabel('Seat token')).toHaveValue('test-seat-token');
+ await page.getByRole('button',{name:'Copy token'}).click();
+ await expect.poll(()=>page.evaluate(()=>window.copied)).toBe('test-seat-token');
+ await page.getByText('Set up Codex').click();
+ await expect(page.getByText('HEY99_SEAT_TOKEN',{exact:false}).first()).toBeVisible();
+ await page.goto('/account/');
+ await page.goto('/studio/');
+ await expect(page.getByLabel('Seat token')).toHaveCount(0);
+});
+
+test('multi-seat account selects an invited seat before generating a token',async({page})=>{
+ const reader={playerName:'reader',playerRoles:['audience']};
+ const writer={playerName:'writer',playerRoles:['contributor']};
+ await mock(page,{authenticated:true,selectedSeat:null});
+ await page.route('**/session',r=>r.fulfill({json:{authenticated:true,selectedSeat:r.request().headers()['x-selected-seat']==='writer'?writer:r.request().headers()['x-selected-seat']==='reader'?reader:null}}));
+ await page.route('**/seats',r=>r.fulfill({json:{seats:[reader,writer]}}));
+ let tokenSeat;
+ await page.route('**/api/player-token',r=>{tokenSeat=r.request().headers()['x-selected-seat'];return r.fulfill({json:{token:'writer-token','expires-at':Date.now()+3600000,'expires-in':3600}})});
+ await page.goto('/studio/');
+ await expect(page.getByText('Choose the Hey99 handle you are acting as.')).toBeVisible();
+ await page.getByLabel('Acting as').selectOption('writer');
+ await expect(page.getByRole('heading',{name:'Connect your AI'})).toBeVisible();
+ await page.getByRole('button',{name:'Generate seat token'}).click();
+ expect(tokenSeat).toBe('writer');
+ await page.getByLabel('Acting as').selectOption('reader');
+ await expect(page.getByRole('heading',{name:'Connect your AI'})).toHaveCount(0);
+ await expect(page.getByLabel('Seat token')).toHaveCount(0);
+});
+
+test('audience seat does not see AI connection controls',async({page})=>{
+ await mock(page,user);
+ await page.goto('/studio/');
+ await expect(page.getByRole('heading',{name:'Connect your AI'})).toHaveCount(0);
+});
+
+test('seat token disappears when it expires',async({page})=>{
+ await mock(page,{...user,selectedSeat:{playerName:'neighbor',playerRoles:['contributor']}});
+ await page.route('**/api/player-token',r=>r.fulfill({json:{token:'short-lived-token','expires-at':Date.now()+1000,'expires-in':1}}));
+ await page.goto('/studio/');
+ await page.getByRole('button',{name:'Generate seat token'}).click();
+ await expect(page.getByLabel('Seat token')).toBeVisible();
+ await expect(page.getByLabel('Seat token')).toHaveCount(0,{timeout:5000});
 });
