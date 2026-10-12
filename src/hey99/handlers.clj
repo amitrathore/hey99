@@ -537,6 +537,9 @@
       (ui/stories-page (get-in state [:attention :feed]))
       (ui/unavailable)))
   (GET "/stories/:slug/" [slug :as request] (story-response request slug))
+  (GET "/stories/:slug" [slug :as request]
+    {:status 308 :headers {"Location" (str "/stories/" slug "/"
+                                          (when-let [q (:query-string request)] (str "?" q)))}})
   (GET "/about/" [] (ui/about-page))
   (GET "/privacy/" [] (ui/privacy-page))
   (GET "/terms/" [] (ui/terms-page))

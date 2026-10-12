@@ -66,7 +66,9 @@
           (str/replace "../market/" "/market/")
           (str/replace "../#opportunity" "/#opportunity")
           (str/replace "href=\"../\"" "href=\"/\"")
-          (str/replace "href=\"./\"" "href=\"/economics/\"")))))
+          (str/replace "href=\"./\"" "href=\"/economics/\"")
+          ;; Keep share tags compact, matching the working homepage markup.
+          (str/replace #"(?s)<meta\b[^>]*>" #(str/replace % #"\s*\n\s*" " "))))))
 (defn hero [title text]
   (str "<section class=\"economics-hero\"><div class=\"wrap\"><span class=\"eyebrow\">#hey99 · Local stories</span><h1>" (escape-html title) "</h1><p class=\"economics-lede\">" (escape-html text) "</p></div></section>"))
 (defn story-card [item]
@@ -80,21 +82,27 @@
            (if (seq items) (str "<div class=\"economics-grid\">" (apply str (map story-card items)) "</div>") "<h2>The first stories are taking shape.</h2><p>Want to help tell the story of your community? Bring an idea, a local discovery or a useful perspective.</p>")
            "<div class=\"hero-actions\"><a class=\"button\" href=\"/join/\">Suggest a story ↗</a><a class=\"text-link\" href=\"/studio/\">Writer’s studio ↗</a></div></div></section>"))))
 (defn story-page [item]
-  (let [p (:payload item) title (:title p) desc (or (:summary p) title)
+  (let [p (:payload item) title (:title p) desc (or (not-empty (str/trim (str (:summary p)))) title)
         date (when (:published-at item) (.toString (.toLocalDate (.atZone (java.time.Instant/ofEpochMilli (long (:published-at item))) (java.time.ZoneId/of "America/Los_Angeles")))))
         html (str (hero title desc) "<section class=\"section\"><article class=\"wrap article-body\"><p class=\"article-byline\">" (if (= "guest" (:byline-kind item)) "By " "From ") (escape-html (:author item)) " · " (escape-html date) "</p>"
                   (featured-image p "story-featured" true)
                   (article-body p)
                   "<div class=\"hero-actions\"><button class=\"button\" data-share>Share this story ↗</button><a class=\"text-link\" href=\"/economics/\">How rewards work ↗</a></div><p class=\"share-note\">Personal sharing links credit your contribution. Hey99 is preparing to launch; checkout and payouts are not active.</p><hr /><h2>Find your place in the community.</h2><p>Bring your business, a connection or an idea.</p><div class=\"hero-actions\"><a class=\"button\" href=\"/join/\">Join Hey99 ↗</a><a class=\"text-link\" href=\"/stories/\">More stories ↗</a></div></article></section>")]
-    (let [rendered (page title desc (str "/stories/" (:slug item) "/") html)]
+    (let [rendered (update (page title desc (str "/stories/" (:slug item) "/") html) :body
+                           #(str/replace % "property=\"og:type\" content=\"website\""
+                                           "property=\"og:type\" content=\"article\""))]
       (if-let [image (safe-image-url (:featured_image p))]
         (let [absolute (str (.resolve (java.net.URI. (str (origin) "/")) image))
-              alt (get-in p [:metadata :featured_image_alt] "")]
+              alt (get-in p [:metadata :featured_image_alt] "")
+              mime (condp re-find (str/lower-case (or (.getPath (java.net.URI. absolute)) ""))
+                     #"\.jpe?g$" "image/jpeg" #"\.png$" "image/png" #"\.webp$" "image/webp" nil)]
           (update rendered :body #(-> %
             (str/replace #"(<meta\s+(?:property=\"og:image\"|name=\"twitter:image\")\s+content=\")[^\"]*" (fn [[_ prefix]] (str prefix (escape-html absolute))))
             (str/replace #"(<meta\s+(?:property=\"og:image:alt\"|name=\"twitter:image:alt\")\s+content=\")[^\"]*" (fn [[_ prefix]] (str prefix (escape-html alt))))
             (str/replace #"(<meta\s+property=\"og:image:height\"\s+content=\")[^\"]*" (fn [[_ prefix]] (str prefix "800")))
-            (str/replace #"<meta property=\"og:image:type\" content=\"[^\"]*\" />" ""))))
+            (str/replace #"<meta property=\"og:image:type\" content=\"[^\"]*\" />"
+                         (str "<meta property=\"og:image:secure_url\" content=\"" (escape-html absolute) "\" />"
+                              (when mime (str "<meta property=\"og:image:type\" content=\"" mime "\" />")))))))
         rendered))))
 (defn workspace [title kind]
   (page title "Your connections, stories and participation in the Hey99 community." (str "/" kind "/")

@@ -138,3 +138,18 @@
       (is (= 200 (:status response)))
       (is (= "no-store" (get-in response [:headers "Cache-Control"])))
       (is (= (ui/article-body payload) (get-in response [:body :html]))))))
+
+(deftest social-preview-metadata-and-canonical-story-urls
+  (let [payload (assoc (:payload article) :summary "  " :featured_image "/assets/featured/movement.jpg")
+        doc (org.jsoup.Jsoup/parse (:body (ui/story-page (assoc article :payload payload))))
+        meta-value (fn [property] (.attr (.selectFirst doc (str "meta[property='" property "']")) "content"))]
+    (is (= "article" (meta-value "og:type")))
+    (is (= "Your local connections" (meta-value "og:description")))
+    (is (= "https://hey99.online/assets/featured/movement.jpg" (meta-value "og:image")))
+    (is (= (meta-value "og:image") (meta-value "og:image:secure_url")))
+    (is (= "image/jpeg" (meta-value "og:image:type"))))
+  (doseq [query [nil "ref=neighbor&campaign=nextdoor"]]
+    (let [response (h/app (assoc (req "/stories/your-local-connections") :query-string query))]
+      (is (= 308 (:status response)))
+      (is (= (str "/stories/your-local-connections/" (when query (str "?" query)))
+             (get-in response [:headers "Location"]))))))
