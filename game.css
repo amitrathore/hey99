@@ -16,3 +16,5 @@
 .founder-story>h2:first-child{margin-top:0}.founder-story>h2{clear:both}
 
 .income-founder-note{padding-top:0}.income-founder-note .founder-background{margin-top:0}
+
+.income-intro-title{max-width:850px;margin-top:28px;font-size:clamp(21px,2.3vw,27px);line-height:1.4;color:var(--lime)}.income-intro-title+.economics-lede{margin-top:16px}.income-expectations{max-width:850px;margin-top:20px;font-size:16px;line-height:1.6;color:#f3edff}

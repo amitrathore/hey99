@@ -195,6 +195,14 @@ test('income page explains earning paths and is discoverable across the site',as
  for(const width of [320,375,768,1440]){
   await page.setViewportSize({width,height:900});await page.goto('/income/');
   await expect(page.locator('h1')).toHaveText('Build a side income. Help your community thrive.');
+  const hero=page.locator('.economics-hero');
+  await expect(hero.locator('.income-intro-title')).toHaveText('An entrepreneurial income stream, built at your own pace.');
+  await expect(hero.locator('.economics-lede')).toContainText('you earn from the outcomes you help create');
+  await expect(hero.locator('.income-expectations')).toContainText('Earnings vary and aren’t guaranteed.');
+  expect(await page.evaluate(()=>Boolean(document.querySelector('.income-intro-title').compareDocumentPosition(document.querySelector('#earning-paths'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+  await expect(page.locator('.income-work-context')).toContainText('AI is changing how work gets done');
+  expect(await page.evaluate(()=>Boolean(document.querySelector('.income-work-context').compareDocumentPosition(document.querySelector('.income-founder-note'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+
   await expect(page.locator('.income-cards article')).toHaveCount(4);
   await expect(page.locator('.income-cards')).toContainText('you passively earn $50');
   await expect(page.locator('.income-cards')).toContainText('you earn $100');
@@ -210,7 +218,7 @@ test('income page explains earning paths and is discoverable across the site',as
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
  }
  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hey99.online/income/');
- await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/active and passive side income/);
+ await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/entrepreneurial side income/);
  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/og-card-v3.png');
  await page.goto('/income?ref=neighbor');await expect(page).toHaveURL(/\/income\/\?ref=neighbor$/);
  await page.locator('footer').screenshot({path:testInfo.outputPath('income-footer.png')});
