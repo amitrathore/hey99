@@ -173,3 +173,29 @@ test('founder page is linked from every footer and fits mobile screens',async({p
  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/Meet Amit Rathore/);
  await page.goto('/about');await expect(page).toHaveURL(/\/about\/$/);
 });
+
+test('income page explains earning paths and is discoverable across the site',async({page})=>{
+ await mock(page);
+ for(const path of ['/','/join/','/market/','/economics/','/about/','/stories/','/privacy/','/account/']){
+  await page.goto(path);
+  await expect(page.locator('footer a[href="/income/"]')).toHaveCount(1);
+  await expect(page.locator('footer a[href="/economics/"]')).toHaveText('Rewards');
+  await expect(page.getByRole('link',{name:'How rewards work',exact:true})).toHaveCount(0);
+ }
+ for(const width of [320,375,768,1440]){
+  await page.setViewportSize({width,height:900});await page.goto('/income/');
+  await expect(page.locator('h1')).toHaveText('Help your community grow.Share in what it creates.');
+  await expect(page.locator('.income-cards article')).toHaveCount(4);
+  await expect(page.locator('.income-cards')).toContainText('you passively earn $50');
+  await expect(page.locator('.income-cards')).toContainText('you earn $100');
+  await expect(page.locator('main')).toContainText('preview activity does not create earnings');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
+ }
+ await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hey99.online/income/');
+ await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/active and passive side income/);
+ await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/og-card-v3.png');
+ await page.goto('/income?ref=neighbor');await expect(page).toHaveURL(/\/income\/\?ref=neighbor$/);
+ await page.locator('footer').screenshot({path:'/private/tmp/hey99-income-footer.png'});
+ await page.screenshot({path:'/private/tmp/hey99-income-desktop.png',fullPage:true});
+ await page.setViewportSize({width:375,height:900});await page.screenshot({path:'/private/tmp/hey99-income-mobile.png',fullPage:true});
+});

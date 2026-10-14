@@ -541,11 +541,12 @@
     {:status 308 :headers {"Location" (str "/stories/" slug "/"
                                           (when-let [q (:query-string request)] (str "?" q)))}})
   (GET "/about/" [] (ui/about-page))
+  (GET "/income/" [] (ui/income-page))
   (GET "/privacy/" [] (ui/privacy-page))
   (GET "/terms/" [] (ui/terms-page))
   (GET "*" [:as request]
     (let [path (:uri request)]
-      (if (contains? #{"/join" "/market" "/economics" "/account" "/share" "/studio" "/stories" "/privacy" "/terms" "/about"} path)
+      (if (contains? #{"/join" "/market" "/economics" "/account" "/share" "/studio" "/stories" "/privacy" "/terms" "/about" "/income"} path)
         {:status 308 :headers {"Location" (str path "/" (when-let [q (:query-string request)] (str "?" q)))}}
         (ui/not-found)))))
 
