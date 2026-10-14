@@ -8,3 +8,5 @@
 
 /* Income: approachable earning paths and clear examples. */
 .income-copy p+p{margin-top:22px}.income-copy .large{font-size:clamp(21px,2.3vw,27px);line-height:1.4}.income-cards .income-example{padding:20px;border-radius:14px;background:#eee8ff;line-height:1.65}.income-example-note{max-width:850px;margin-top:36px;font-size:16px;line-height:1.65;color:var(--muted)}.income-example-note a{font-weight:800}.income-cards h3{font-size:32px}@media(max-width:700px){.income-cards .income-example{padding:16px}.income-cards h3{font-size:28px}}
+
+.income-cards .economics-index{display:inline-block;max-width:100%;padding:8px 12px;border-radius:10px;background:var(--lime);color:var(--purple-deep);font-weight:800;line-height:1.5}
