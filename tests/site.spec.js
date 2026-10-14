@@ -199,6 +199,14 @@ test('income page explains earning paths and is discoverable across the site',as
   await expect(page.locator('.income-cards')).toContainText('you passively earn $50');
   await expect(page.locator('.income-cards')).toContainText('you earn $100');
   await expect(page.locator('main')).toContainText('preview activity does not create earnings');
+  const note=page.locator('.income-founder-note .founder-background');
+  await expect(note.locator('summary')).toHaveText('Why I believe in Hey99—and the experience behind it.');
+  await expect(note).not.toHaveAttribute('open','');
+  await note.locator('summary').focus();await page.keyboard.press('Enter');
+  await expect(note.getByRole('heading',{name:'Why I believe in Hey99'})).toBeVisible();
+  await expect(note).toContainText('A note from Amit Rathore, founder of Hey99.');
+  await expect(note).toContainText('community growth alongside business growth');
+
   expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth)).toBe(false);
  }
  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hey99.online/income/');
