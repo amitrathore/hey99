@@ -4,9 +4,13 @@
 
 .story-featured,.story-thumb,.article-body figure img{display:block;width:100%;height:auto;border-radius:16px}.story-featured{margin:30px 0 38px;aspect-ratio:3/2;object-fit:cover}.story-thumb{aspect-ratio:3/2;object-fit:cover;margin-bottom:24px}.article-body figure{margin:40px 0}.article-body img{max-width:100%;height:auto}.article-body figcaption{margin-top:12px;color:var(--muted);font-size:15px;line-height:1.5}.article-body a,.article-body p{overflow-wrap:anywhere}.article-body li{margin:12px 0;font-size:20px;line-height:1.65}.story-preview:empty{display:none}.story-preview{margin:24px 0}.story-preview p{font-size:18px;line-height:1.65}@media(max-width:700px){.article-body figure{margin:30px 0}.article-body li{font-size:18px}.story-featured,.story-thumb,.article-body figure img{border-radius:12px}}
 
-.founder-portrait{max-width:360px;margin:0 auto 44px!important}.founder-portrait img{width:100%;height:auto;border-radius:22px}.founder-portrait figcaption{text-align:center}.founder-background{margin-top:48px;padding-top:24px;border-top:1px solid #d8ceee}.founder-background summary{cursor:pointer;font-weight:700}.founder-background p{font-size:16px;line-height:1.65;margin-top:18px}.founder-story>.hero-actions{flex-wrap:wrap}@media(max-width:700px){.founder-portrait{max-width:280px}.founder-story>.hero-actions{align-items:stretch;gap:24px}}
+.founder-portrait{float:left;width:120px;max-width:32%;margin:24px 22px 12px 0!important}.founder-portrait img{width:100%;height:auto;border-radius:14px}.founder-portrait figcaption{text-align:center}.founder-background{margin-top:48px;padding-top:24px;border-top:1px solid #d8ceee}.founder-background summary{cursor:pointer;font-weight:700}.founder-background p{font-size:16px;line-height:1.65;margin-top:18px}.founder-story>.hero-actions{flex-wrap:wrap}@media(max-width:700px){.founder-portrait{width:96px;margin-right:18px!important}.founder-story>.hero-actions{align-items:stretch;gap:24px}}
 
 /* Income: approachable earning paths and clear examples. */
 .income-copy p+p{margin-top:22px}.income-copy .large{font-size:clamp(21px,2.3vw,27px);line-height:1.4}.income-cards .income-example{padding:20px;border-radius:14px;background:#eee8ff;line-height:1.65}.income-example-note{max-width:850px;margin-top:36px;font-size:16px;line-height:1.65;color:var(--muted)}.income-example-note a{font-weight:800}.income-cards h3{font-size:32px}@media(max-width:700px){.income-cards .income-example{padding:16px}.income-cards h3{font-size:28px}}
 
 .income-cards .economics-index{display:inline-block;max-width:100%;padding:8px 12px;border-radius:10px;background:var(--lime);color:var(--purple-deep);font-weight:800;line-height:1.5}
+
+.founder-background h3{margin-top:24px;font-size:28px}
+
+.founder-story>h2:first-child{margin-top:0}.founder-story>h2{clear:both}

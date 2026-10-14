@@ -157,7 +157,7 @@ test('illustrated story images fit mobile screens and load with sharing metadata
  await page.setViewportSize({width:375,height:900});await page.screenshot({path:testInfo.outputPath('illustrated-mobile.png'),fullPage:true});
 });
 
-test('founder page is linked from every footer and fits mobile screens',async({page})=>{
+test('founder page is linked from every footer and fits mobile screens',async({page},testInfo)=>{
  await mock(page);
  for(const path of ['/','/join/','/market/','/economics/','/stories/','/account/','/studio/']){
   await page.goto(path);await expect(page.locator('footer a[href="/about/"]')).toHaveCount(1);
@@ -165,8 +165,18 @@ test('founder page is linked from every footer and fits mobile screens',async({p
  for(const width of [320,375,1440]){
   await page.setViewportSize({width,height:900});await page.goto('/about/');
   await expect(page.locator('h1')).toHaveText('Hi, I’m Amit.');
-  await expect(page.getByText('everyday people like us',{exact:false})).toBeVisible();
+  await expect(page.getByText('And I want everyday people like us',{exact:false})).toBeVisible();
   const portrait=page.locator('.founder-portrait img');await expect.poll(()=>portrait.evaluate(i=>i.complete&&i.naturalWidth>0)).toBe(true);
+  expect((await portrait.boundingBox()).width).toBeLessThanOrEqual(120);
+  const background=page.locator('.founder-background');
+  await expect(background).not.toHaveAttribute('open','');
+  await expect(background.getByRole('heading',{name:'Why I believe in Hey99'})).toBeHidden();
+  await background.locator('summary').focus();await page.keyboard.press('Enter');
+  await expect(background.getByRole('heading',{name:'Why I believe in Hey99'})).toBeVisible();
+  await expect(background).toContainText('serial entrepreneur and inventor');
+  await expect(background).toContainText('community growth alongside business growth');
+  await expect(background.locator('a[href="https://patents.google.com/patent/WO2021248144A1/"]')).toHaveCount(1);
+  if(width===375)await page.locator('.founder-story').screenshot({path:testInfo.outputPath('founder-mobile.png')});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(0);
  }
  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href','https://hey99.online/about/');
