@@ -184,7 +184,7 @@ test('income page explains earning paths and is discoverable across the site',as
  }
  for(const width of [320,375,768,1440]){
   await page.setViewportSize({width,height:900});await page.goto('/income/');
-  await expect(page.locator('h1')).toHaveText('Help your community grow.Share in what it creates.');
+  await expect(page.locator('h1')).toHaveText('Help your community grow. Share in what it creates.');
   await expect(page.locator('.income-cards article')).toHaveCount(4);
   await expect(page.locator('.income-cards')).toContainText('you passively earn $50');
   await expect(page.locator('.income-cards')).toContainText('you earn $100');
