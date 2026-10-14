@@ -174,7 +174,7 @@ test('founder page is linked from every footer and fits mobile screens',async({p
  await page.goto('/about');await expect(page).toHaveURL(/\/about\/$/);
 });
 
-test('income page explains earning paths and is discoverable across the site',async({page})=>{
+test('income page explains earning paths and is discoverable across the site',async({page},testInfo)=>{
  await mock(page);
  for(const path of ['/','/join/','/market/','/economics/','/about/','/stories/','/privacy/','/account/']){
   await page.goto(path);
@@ -195,7 +195,7 @@ test('income page explains earning paths and is discoverable across the site',as
  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content',/active and passive side income/);
  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content','https://hey99.online/assets/og-card-v3.png');
  await page.goto('/income?ref=neighbor');await expect(page).toHaveURL(/\/income\/\?ref=neighbor$/);
- await page.locator('footer').screenshot({path:'/private/tmp/hey99-income-footer.png'});
- await page.screenshot({path:'/private/tmp/hey99-income-desktop.png',fullPage:true});
- await page.setViewportSize({width:375,height:900});await page.screenshot({path:'/private/tmp/hey99-income-mobile.png',fullPage:true});
+ await page.locator('footer').screenshot({path:testInfo.outputPath('income-footer.png')});
+ await page.screenshot({path:testInfo.outputPath('income-desktop.png'),fullPage:true});
+ await page.setViewportSize({width:375,height:900});await page.screenshot({path:testInfo.outputPath('income-mobile.png'),fullPage:true});
 });
