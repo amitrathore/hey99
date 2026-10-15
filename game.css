@@ -18,3 +18,5 @@
 .income-founder-note{padding-top:0}.income-founder-note .founder-background{margin-top:0}
 
 .income-intro-title{max-width:850px;margin-top:28px;font-size:clamp(21px,2.3vw,27px);line-height:1.4;color:var(--lime)}.income-intro-title+.economics-lede{margin-top:16px}.income-expectations{max-width:850px;margin-top:20px;font-size:16px;line-height:1.6;color:#f3edff}
+
+.income-founder-note .founder-background>summary{padding:12px 16px;border-radius:12px;background:var(--lime);color:var(--purple-deep);line-height:1.6;list-style-position:inside}
